@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.scss';
-import Header from './components/Header/Header';
+import Loading from './components/Loading/Loading';
 import Weather from './components/Weather/Weather';
 
 const SpeechRecognition =
@@ -8,34 +8,78 @@ const SpeechRecognition =
 
 const mic = new SpeechRecognition();
 
-mic.continous = true;
+mic.continuos = true;
 mic.interimResults = true;
-mic.lang = 'pl';
+mic.lang = 'en-US';
 
 const App = () => {
   const [city, setCity] = useState('');
   const [weather, setWeather] = useState({});
   const [isListening, setIsListening] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [existsCity, setExistsCity] = useState(false);
+  const [error, setError] = useState(null);
+  const [recent, setRecent] = useState(false);
+  const [userSearches, setUserSearches] = useState([]);
 
   useEffect(() => {
     handleListen();
+    setUserSearches(JSON.parse(localStorage.getItem('recent-search')));
   }, [isListening]);
 
+  const addRecent = value => {
+    const words = JSON.parse(localStorage.getItem('recent-search'));
+    if (words.length > 10) {
+      words.shift();
+    }
+
+    const exists = words.indexOf(i => i === value);
+
+    if (value !== '' && exists === -1) words.push(value);
+
+    localStorage.setItem('recent-search', JSON.stringify(words));
+  };
+
+  const handleMapRecent = () => {
+    if (userSearches) {
+      return userSearches.map((name, index) => (
+        <p
+          key={index}
+          onClick={() => getWeather(name)}
+          className="app__recent-name"
+        >
+          {name}
+        </p>
+      ));
+    }
+  };
+
   const getWeather = name => {
-    console.log(name);
-    fetch(
-      `https://community-open-weather-map.p.rapidapi.com/find?q=${name}&units=metric`,
-      {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key':
-            'ab01974f42mshe14ae2d856bc706p1848dfjsnf0108d65ba77',
-          'x-rapidapi-host': 'community-open-weather-map.p.rapidapi.com',
-        },
-      }
-    )
-      .then(res => res.json())
-      .then(json => setWeather(json));
+    addRecent(name);
+
+    if (name.length > 1) {
+      setRecent(false);
+      setLoading(true);
+      setExistsCity(false);
+      fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=7e370e3dd7190049ec2699d522a30847&units=metric`
+      )
+        .then(res => res.json())
+        .then(json => {
+          if (json.cod === '404') {
+            setLoading(false);
+            setExistsCity(false);
+            setError(true);
+          } else {
+            setWeather(json);
+            setLoading(false);
+            setExistsCity(true);
+            setError(false);
+          }
+        });
+      return;
+    }
+    setError(true);
   };
 
   const handleListen = () => {
@@ -73,11 +117,15 @@ const App = () => {
   };
 
   return (
-    <div className="app">
-      <Header />
+    <div className={`app ${existsCity ? weather.weather[0].main : null}`}>
       <div className="app__search-container">
-        <label>
+        <label className="app__label">
+          <button onClick={() => getWeather(city)} className="app__btn-search">
+            <i className="fas fa-search"></i>
+          </button>
           <input
+            onFocus={() => setRecent(true)}
+            // onBlur={() => setRecent(false)}
             onKeyDown={e => {
               if (e.code === 'Enter') getWeather(city);
             }}
@@ -85,26 +133,26 @@ const App = () => {
             value={city}
             className="app__search"
             type="text"
-            placeholder="Enter a city to see weather"
+            placeholder="San Francisco"
           />
-
-          <button onClick={() => getWeather(city)} className="app__btn">
-            <i className="fas fa-search"></i>
-          </button>
-          {isListening ? (
-            <p className="app__mic-info">Microphone is working</p>
-          ) : (
-            <p className="app__mic-info">Microphone is off</p>
-          )}
-          <button
-            className="app__mic"
-            onClick={() => setIsListening(prevState => !prevState)}
-          >
-            <i className="fas fa-microphone"></i>
+          {isListening && <i className="fas fa-circle"></i>}
+          <button className="app__mic" onClick={() => setIsListening(true)}>
+            {!isListening && <i className="fas fa-microphone"></i>}
+            {isListening && <i className="fas fa-microphone-slash"></i>}
           </button>
         </label>
+        {recent && userSearches.length > 0 && (
+          <div className="app__recent">{handleMapRecent()}</div>
+        )}
       </div>
-      <Weather weather={weather.list} />
+      {!loading && existsCity && <Weather weather={weather} />}
+      {loading && <Loading />}
+      {error && (
+        <p className="app__error">
+          City not found. Please enter a valid name of city and remember name of
+          city must be at least 3 words!
+        </p>
+      )}
     </div>
   );
 };
