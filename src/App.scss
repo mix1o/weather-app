@@ -15,6 +15,7 @@ body {
   background: rgb(58, 76, 98);
   background-position: center;
   background-size: cover;
+  overflow: hidden;
 
   &__recent {
     background: #edf2f7;
@@ -30,7 +31,7 @@ body {
   }
   &__search-container {
     text-align: center;
-    padding: 2rem;
+    padding: 0.5rem 2rem;
   }
   &__label {
     background: #f7fafc;
@@ -58,6 +59,7 @@ body {
     border: none;
     font-size: 1.6rem;
     margin-left: 1rem;
+    background: transparent;
   }
   &__mic {
     background: transparent;
@@ -231,5 +233,85 @@ body {
     font-size: 2rem;
     color: #edf2f7;
     font-weight: 200;
+  }
+}
+
+.hamburger {
+  position: relative;
+  padding: 2rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__heading {
+    font-size: 1.7rem;
+    color: #edf2f7;
+  }
+  &__icon {
+    text-align: right;
+    z-index: 30;
+    position: relative;
+    color: #edf2f7;
+    font-size: 2rem;
+    .fa-times {
+      color: #333;
+    }
+  }
+  &__rights {
+    margin-top: 5rem;
+  }
+  &__container-recent {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  &__recent-words {
+    background: #c2c2c2;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    margin: 1rem 0.5rem;
+  }
+  &__main-heading {
+    font-size: 2.2rem;
+    text-align: center;
+    font-weight: 400;
+  }
+  &__description {
+    font-size: 1.3rem;
+    color: #333;
+    font-weight: 200;
+    text-align: center;
+  }
+  &__label {
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+  }
+  &__input {
+    border: none;
+    background: transparent;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
+  }
+  &__btn {
+    border: none;
+    background: transparent;
+    margin-left: 1rem;
+    font-size: 1.2rem;
+  }
+  &__input:focus {
+    outline: none;
+    border-bottom: 2px solid rgb(112, 146, 187);
+  }
+  .fa-home,
+  .fa-search {
+    margin-left: 1rem;
+  }
+  &__footer-text {
+    font-size: 1.3rem;
+    color: rgb(102, 102, 102);
   }
 }

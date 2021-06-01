@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import './App.scss';
+import Hamburger from './components/Hamburger/Hamburger';
 import Loading from './components/Loading/Loading';
 import Weather from './components/Weather/Weather';
+import { ACTIONS } from './consts/Actions';
 
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -19,17 +21,17 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [existsCity, setExistsCity] = useState(false);
   const [error, setError] = useState(null);
-
-  // DROPDOWN
-  const [open, setOpen] = useState(false);
-  //
+  const [showDefault, setShowDefault] = useState(true);
 
   useEffect(() => {
     handleListen();
   }, [isListening]);
 
-  const getWeather = name => {
+  const getWeather = (name, add = true) => {
     if (name.length > 1) {
+      if (add) {
+        dispatch({ type: ACTIONS.ADD, payload: { name } });
+      }
       setLoading(true);
       setExistsCity(false);
       fetch(
@@ -46,6 +48,7 @@ const App = () => {
             setLoading(false);
             setExistsCity(true);
             setError(false);
+            setShowDefault(false);
           }
         });
       return;
@@ -87,8 +90,67 @@ const App = () => {
     };
   };
 
+  const reducer = useCallback((userData, action) => {
+    switch (action.type) {
+      case ACTIONS.ADD:
+        const index = userData
+          .slice(1)
+          .findIndex(
+            element =>
+              element.toLowerCase() === action.payload.name.toLowerCase()
+          );
+        if (userData.length === 16) {
+          userData.splice(1, 1);
+        }
+
+        if (index === -1 && userData.length <= 16) {
+          return [...userData, action.payload.name];
+        }
+
+        return [...userData];
+
+      case ACTIONS.DEFAULT_CITY:
+        userData[0].defaultCity = action.payload.city;
+        return [...userData];
+    }
+  }, []);
+
+  const [userData, dispatch] = useReducer(
+    reducer,
+    [
+      {
+        defaultCity: '',
+      },
+    ],
+    () => {
+      const localData = localStorage.getItem('user-data');
+      return localData
+        ? JSON.parse(localData)
+        : [
+            {
+              defaultCity: '',
+            },
+          ];
+    }
+  );
+
+  useEffect(() => {
+    window.localStorage.setItem('user-data', JSON.stringify(userData));
+
+    if (userData[0].defaultCity !== '' && !existsCity && showDefault) {
+      const name = userData[0].defaultCity;
+      getWeather(name, false);
+    }
+  }, [userData]);
+
+  console.log(weather);
   return (
     <div className={`app ${existsCity ? weather.weather[0].main : null}`}>
+      <Hamburger
+        getWeather={getWeather}
+        userData={userData}
+        dispatch={dispatch}
+      />
       <div className="app__search-container">
         <label className="app__label">
           <button onClick={() => getWeather(city)} className="app__btn-search">
@@ -111,7 +173,7 @@ const App = () => {
           </button>
         </label>
       </div>
-      {open && <div>DUPA</div>}
+
       {!loading && existsCity && <Weather weather={weather} />}
       {loading && <Loading />}
       {error && (
