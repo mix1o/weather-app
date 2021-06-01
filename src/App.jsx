@@ -19,50 +19,21 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [existsCity, setExistsCity] = useState(false);
   const [error, setError] = useState(null);
-  const [recent, setRecent] = useState(false);
-  const [userSearches, setUserSearches] = useState([]);
+
+  // DROPDOWN
+  const [open, setOpen] = useState(false);
+  //
 
   useEffect(() => {
     handleListen();
-    setUserSearches(JSON.parse(localStorage.getItem('recent-search')));
   }, [isListening]);
 
-  const addRecent = value => {
-    const words = JSON.parse(localStorage.getItem('recent-search'));
-    if (words.length > 10) {
-      words.shift();
-    }
-
-    const exists = words.indexOf(i => i === value);
-
-    if (value !== '' && exists === -1) words.push(value);
-
-    localStorage.setItem('recent-search', JSON.stringify(words));
-  };
-
-  const handleMapRecent = () => {
-    if (userSearches) {
-      return userSearches.map((name, index) => (
-        <p
-          key={index}
-          onClick={() => getWeather(name)}
-          className="app__recent-name"
-        >
-          {name}
-        </p>
-      ));
-    }
-  };
-
   const getWeather = name => {
-    addRecent(name);
-
     if (name.length > 1) {
-      setRecent(false);
       setLoading(true);
       setExistsCity(false);
       fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=7e370e3dd7190049ec2699d522a30847&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=${process.env.REACT_APP_WEATHER_API_KEY}&units=metric`
       )
         .then(res => res.json())
         .then(json => {
@@ -124,8 +95,6 @@ const App = () => {
             <i className="fas fa-search"></i>
           </button>
           <input
-            onFocus={() => setRecent(true)}
-            // onBlur={() => setRecent(false)}
             onKeyDown={e => {
               if (e.code === 'Enter') getWeather(city);
             }}
@@ -141,10 +110,8 @@ const App = () => {
             {isListening && <i className="fas fa-microphone-slash"></i>}
           </button>
         </label>
-        {recent && userSearches.length > 0 && (
-          <div className="app__recent">{handleMapRecent()}</div>
-        )}
       </div>
+      {open && <div>DUPA</div>}
       {!loading && existsCity && <Weather weather={weather} />}
       {loading && <Loading />}
       {error && (

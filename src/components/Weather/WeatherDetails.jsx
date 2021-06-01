@@ -4,7 +4,7 @@ const WeatherDetails = ({ weather }) => {
       <div className="weather__info">
         <div>
           <p className="weather__details-main">
-            {weather.main.temp_min}&#176; C
+            {weather.main.temp_min.toFixed(0)}&#176; C
           </p>
           <p className="weather__details-description">Temperature min</p>
         </div>
@@ -20,7 +20,7 @@ const WeatherDetails = ({ weather }) => {
       <div className="weather__info weather__info--lower">
         <div>
           <p className="weather__details-main">
-            {weather.main.temp_max}&#176; C
+            {weather.main.temp_max.toFixed(0)}&#176; C
           </p>
           <p className="weather__details-description">Temperature max</p>
         </div>

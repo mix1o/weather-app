@@ -5,7 +5,7 @@ const NextDay = ({ lat, lon }) => {
 
   useEffect(() => {
     fetch(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=hourly&appid=7e370e3dd7190049ec2699d522a30847&units=metric`
+      `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=hourly&appid=${process.env.REACT_APP_WEATHER_API_KEY}&units=metric`
     )
       .then(res => res.json())
       .then(json => setNextDaysWeather(json.daily));
