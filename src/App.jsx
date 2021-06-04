@@ -4,6 +4,7 @@ import Hamburger from './components/Hamburger/Hamburger';
 import Loading from './components/Loading/Loading';
 import Weather from './components/Weather/Weather';
 import { ACTIONS } from './consts/Actions';
+import Main from './components/Main/Main';
 
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -58,9 +59,6 @@ const App = () => {
 
   const handleListen = () => {
     if (isListening) {
-      if (city.length > 0) {
-        setCity('');
-      }
       mic.start();
     } else {
       mic.stop();
@@ -150,6 +148,7 @@ const App = () => {
         getWeather={getWeather}
         userData={userData}
         dispatch={dispatch}
+        setCity={setCity}
       />
       <div className="app__search-container">
         <label className="app__label">
@@ -167,16 +166,19 @@ const App = () => {
             placeholder="San Francisco"
           />
           {isListening && <i className="fas fa-circle"></i>}
-          <button className="app__mic" onClick={() => setIsListening(true)}>
+          <button
+            className="app__mic"
+            onClick={() => setIsListening(prevState => !prevState)}
+          >
             {!isListening && <i className="fas fa-microphone"></i>}
             {isListening && <i className="fas fa-microphone-slash"></i>}
           </button>
         </label>
       </div>
-
+      {!existsCity && userData[0].defaultCity === '' && <Main />}
       {!loading && existsCity && <Weather weather={weather} />}
       {loading && <Loading />}
-      {error && (
+      {error && city.length > 1 && (
         <p className="app__error">
           City not found. Please enter a valid name of city and remember name of
           city must be at least 3 words!

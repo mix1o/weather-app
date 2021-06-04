@@ -19,7 +19,7 @@ const HamburgerContent = styled.div`
   flex-direction: column;
 `;
 
-const Hamburger = ({ dispatch, userData, getWeather }) => {
+const Hamburger = ({ dispatch, userData, getWeather, setCity }) => {
   const [open, setOpen] = useState(false);
   const [userCity, setUserCity] = useState('');
 
@@ -50,6 +50,7 @@ const Hamburger = ({ dispatch, userData, getWeather }) => {
                 onClick={() => {
                   getWeather(value);
                   setOpen(false);
+                  setCity(value);
                 }}
                 key={id}
                 className="hamburger__recent-words"
@@ -74,12 +75,12 @@ const Hamburger = ({ dispatch, userData, getWeather }) => {
               type="text"
             />
             <button
-              onClick={() => {
-                dispatch({
+              onClick={async () => {
+                const newCity = await dispatch({
                   type: ACTIONS.DEFAULT_CITY,
                   payload: { city: userCity },
                 });
-                setOpen(false);
+                window.location.reload();
               }}
               className="hamburger__btn"
             >
