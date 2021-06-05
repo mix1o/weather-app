@@ -41,7 +41,10 @@ const Weather = ({ weather }) => {
           <div className="weather__current">
             {weather.weather.map(({ main, icon }, index) => (
               <div key={index} className="weather__container">
-                <img src={`http://openweathermap.org/img/wn/${icon}@2x.png`} />
+                <img
+                  src={`http://openweathermap.org/img/wn/${icon}@2x.png`}
+                  alt="Image weather"
+                />
                 <div>
                   <p className="weather__temperature">
                     {weather.main.temp.toFixed(0)}

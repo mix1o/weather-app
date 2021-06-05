@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ACTIONS } from '../../consts/Actions';
 
 const HamburgerContent = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   height: 100vh;

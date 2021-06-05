@@ -20,7 +20,10 @@ const NextDay = ({ lat, lon }) => {
               <p className="next-day__date">
                 {new Date(day.dt * 1000).toLocaleDateString()}
               </p>
-              <img src={`http://openweathermap.org/img/wn/${icon}.png`} />
+              <img
+                alt="Image weather"
+                src={`http://openweathermap.org/img/wn/${icon}.png`}
+              />
               <p className="next-day__temp">
                 {day.temp.day.toFixed(0)}&#176; C
               </p>

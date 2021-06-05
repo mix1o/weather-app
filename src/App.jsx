@@ -28,8 +28,9 @@ const App = () => {
     handleListen();
   }, [isListening]);
 
+  console.log(error);
   const getWeather = (name, add = true) => {
-    if (name.length > 1) {
+    if (name.length > 0) {
       if (add) {
         dispatch({ type: ACTIONS.ADD, payload: { name } });
       }
@@ -40,6 +41,7 @@ const App = () => {
       )
         .then(res => res.json())
         .then(json => {
+          console.log(json);
           if (json.cod === '404') {
             setLoading(false);
             setExistsCity(false);
@@ -141,7 +143,6 @@ const App = () => {
     }
   }, [userData]);
 
-  console.log(weather);
   return (
     <div className={`app ${existsCity ? weather.weather[0].main : null}`}>
       <Hamburger
@@ -157,7 +158,7 @@ const App = () => {
           </button>
           <input
             onKeyDown={e => {
-              if (e.code === 'Enter') getWeather(city);
+              if (e.key === 'Enter') getWeather(city);
             }}
             onChange={e => setCity(e.target.value)}
             value={city}
@@ -178,7 +179,7 @@ const App = () => {
       {!existsCity && userData[0].defaultCity === '' && <Main />}
       {!loading && existsCity && <Weather weather={weather} />}
       {loading && <Loading />}
-      {error && city.length > 1 && (
+      {error && (
         <p className="app__error">
           City not found. Please enter a valid name of city and remember name of
           city must be at least 3 words!
