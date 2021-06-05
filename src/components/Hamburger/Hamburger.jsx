@@ -27,14 +27,14 @@ const Hamburger = ({ dispatch, userData, getWeather, setCity }) => {
     <div className="hamburger">
       <div className="hamburger__header">
         <p className="hamburger__heading">Weather App</p>
-        <div className="hamburger__icon">
+        <button className="hamburger__icon">
           {!open && (
             <i onClick={() => setOpen(true)} className="fas fa-bars"></i>
           )}
           {open && (
             <i onClick={() => setOpen(false)} className="fas fa-times"></i>
           )}
-        </div>
+        </button>
       </div>
       <HamburgerContent open={open}>
         <div className="hamburger__recent">
